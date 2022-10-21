@@ -6,6 +6,7 @@ import config
 ## Preprocessing 
 import pandas as pd 
 from langdetect import detect
+import iso639
 
 # initialize api instance
 consumer_key= config.consumer_key 
@@ -31,5 +32,22 @@ def get_woeid(place):
         print('Exception:',e)
         return(0)
       
+
+def get_trends_by_location(loc_id,count):
+    '''Get Trending Tweets by Location'''
+    
+    try:
+        trends = api.get_place_trends(loc_id)
+        df = pd.DataFrame([trending['name'],  trending['tweet_volume'], iso639.to_name(detect(trending['name']))] for trending in trends[0]['trends'])
+        df.columns = ['Trends','Volume','Language']
+        #df = df.sort_values('Volume', ascending = False)
+        return(df[:count])
+    except Exception as e:
+        print("An exception occurred",e)
+        
            
-get_woeid('Pakistan')
+locationID = get_woeid('Pakistan')
+
+print(locationID)
+
+print(get_trends_by_location(locationID,10))
