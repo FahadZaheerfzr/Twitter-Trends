@@ -5,7 +5,6 @@ import config
 
 ## Preprocessing 
 import pandas as pd 
-from langdetect import detect
 
 from googletrans import Translator  # Import Translator module from googletrans package
 
