@@ -6,7 +6,6 @@ import config
 ## Preprocessing 
 import pandas as pd 
 from langdetect import detect
-import iso639
 
 from googletrans import Translator  # Import Translator module from googletrans package
 
@@ -23,9 +22,11 @@ api = tweepy.API(auth,wait_on_rate_limit=True)
 
 
 def get_woeid(place):
-    '''Get woeid by location'''
+    '''This function returns the WOEID of a place'''
     try:
+        # Get the available trends
         trends = api.available_trends()
+        # Match the place with the trends location
         for val in trends:
             if (val['name'].lower() == place.lower()):
                 return(val['woeid']) 
@@ -36,12 +37,14 @@ def get_woeid(place):
       
 
 def get_trends_by_location(loc_id,count):
-    '''Get Trending Tweets by Location'''
+    '''This function returns the top trends of a location'''
     
     try:
+        # Get the trends
         trends = api.get_place_trends(loc_id)
-        df = pd.DataFrame([trending['name'],  trending['tweet_volume'], iso639.to_name(detect(trending['name']))] for trending in trends[0]['trends'])
-        df.columns = ['Trends','Volume','Language']
+        # Get the trends list
+        df = pd.DataFrame([trending['name'],  trending['tweet_volume']] for trending in trends[0]['trends'])
+        df.columns = ['Trends','Volume']
         return(df[:count])
     except Exception as e:
         print("An exception occurred",e)
@@ -56,11 +59,12 @@ def get_translation(text):
     except Exception as e:
         print("Exception", e)
 
-
+# Get the WOEID of the Pakistan
 locationID = get_woeid('Pakistan')
 
+# Get the top 15 trends of Pakistan
 df_world_trends = get_trends_by_location(locationID,15)
-
+# Translate the trends in English
 df_world_trends["Translated_Trends"] = [get_translation(val) for val in df_world_trends.Trends] 
-df_world_trends.drop("Language",axis=1,inplace=True)
+# Display the trends
 print(df_world_trends)
