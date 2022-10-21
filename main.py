@@ -50,8 +50,8 @@ def get_trends_by_location(loc_id,count):
 def get_translation(text):
     ''' Translate text in English'''
     try:
-        translator = Translator() # Create object of Translator.
-        translated = translator.translate(text,dest='en')
+        translator = Translator(service_urls=['translate.googleapis.com']) # Create object of Translator.
+        translated = translator.translate(text)
         return(translated.text)
     except Exception as e:
         print("Exception", e)
@@ -59,9 +59,8 @@ def get_translation(text):
 
 locationID = get_woeid('Pakistan')
 
-trends = get_trends_by_location(locationID,10)
+df_world_trends = get_trends_by_location(locationID,15)
 
-
-trends['Trends'] = [get_translation(trend) for trend in trends['Trends']]
-
-print(trends)
+df_world_trends["Translated_Trends"] = [get_translation(val) for val in df_world_trends.Trends] 
+df_world_trends.drop("Language",axis=1,inplace=True)
+print(df_world_trends)
